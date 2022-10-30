@@ -1,0 +1,1 @@
+1. Currently, pressing a number button rebuilds the entire game page. Ideally it should only rebuild the score view.
