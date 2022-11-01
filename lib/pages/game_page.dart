@@ -110,38 +110,14 @@ class _GamePageState extends ConsumerState<GamePage> {
     );
   }
 
-  Widget buildSubmitButton(Game game) {
-    return game.newScore > 0
-        ? buildActionButton(
-            'OK',
-            () {
-              if (game.throwingPlayer == game.playerOne) {
-                ref.read(gameController.notifier).updatePlayerOneScore();
-              } else {
-                ref.read(gameController.notifier).updatePlayerTwoScore();
-              }
-            },
-          )
-        : buildActionButton(
-            'NO SCORE',
-            () {
-              if (game.throwingPlayer == game.playerOne) {
-                ref.read(gameController.notifier).updatePlayerOneScore();
-              } else {
-                ref.read(gameController.notifier).updatePlayerTwoScore();
-              }
-            },
-          );
-  }
-
   //Evaluates whether the game has finished (a player has reached 0) and shows a dialog if true
   void evaluateGameState(Game game) {
     if (game.gameOver) {
       String winningPlayer;
-      if (game.playerOne.remainingScore == 0) {
-        winningPlayer = game.playerOne.name;
+      if (game.players[0].remainingScore == 0) {
+        winningPlayer = game.players[0].name;
       } else {
-        winningPlayer = game.playerTwo.name;
+        winningPlayer = game.players[1].name;
       }
       showDialog(
         context: context,
@@ -184,8 +160,8 @@ class _GamePageState extends ConsumerState<GamePage> {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => evaluateGameState(game));
 
-    Player playerOne = game.playerOne;
-    Player playerTwo = game.playerTwo;
+    Player playerOne = game.players[0];
+    Player playerTwo = game.players[1];
     _newScoreController.text = game.newScore.toString();
 
     return Scaffold(
@@ -265,14 +241,18 @@ class _GamePageState extends ConsumerState<GamePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        buildActionButton('CHECKOUT', () {
+                          ref
+                              .read(gameController.notifier)
+                              .checkoutPlayer(game.throwingPlayer.id);
+                        }),
+                        buildNumberButton(0),
                         buildActionButton(
-                          'CHECKOUT',
+                          game.newScore > 0 ? 'OK' : 'NO SCORE',
                           () => ref
                               .read(gameController.notifier)
-                              .checkoutCurrentPlayer(),
+                              .updatePlayerScore(game.throwingPlayer.id),
                         ),
-                        buildNumberButton(0),
-                        buildSubmitButton(game),
                       ],
                     ),
                   ),

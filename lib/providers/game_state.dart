@@ -1,3 +1,4 @@
+import 'package:darts_counter/extensions/list_extensions.dart';
 import 'package:darts_counter/models/game.dart';
 import 'package:darts_counter/models/game_settings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,71 +15,67 @@ class GameNotifier extends StateNotifier<Game> {
   GameNotifier({required GameSettings gameSettings})
       : super(Game(
           gameSettings,
-          gameSettings.playerOne,
-          gameSettings.playerTwo,
+          [gameSettings.playerOne, gameSettings.playerTwo],
           0,
           false,
-          {},
+          const {},
         ));
 
-  void updatePlayerOneScore() {
-    final newRemainingScore = state.playerOne.remainingScore - state.newScore;
-    if (newRemainingScore < 0 || newRemainingScore == 1) {
-      return;
+  void updatePlayerScore(int playerId, {bool checkout = false}) {
+    int newRemainingScore = 0;
+    final player = state.players.firstWhere((p) => p.id == playerId);
+
+    if (checkout) {
+      if (player.remainingScore > 170) {
+        return;
+      }
+      newRemainingScore = 0;
+    } else {
+      newRemainingScore = player.remainingScore - state.newScore;
+      if (newRemainingScore < 0 || newRemainingScore == 1) {
+        return;
+      }
     }
     final isGameOver = newRemainingScore == 0;
 
+    //update previousScores map
     final newPreviousScoresMap = Map<int, List<int>>.from(state.previousScores);
-    if (newPreviousScoresMap.containsKey(state.playerOne.id)) {
-      final playersPreviousScores = newPreviousScoresMap[state.playerOne.id];
+    if (newPreviousScoresMap.containsKey(player.id)) {
+      //if player already has a previous score registered add the new score
+      final playersPreviousScores = newPreviousScoresMap[player.id];
       playersPreviousScores?.add(state.newScore);
-      newPreviousScoresMap[state.playerOne.id] = playersPreviousScores!;
-    }else{
-      newPreviousScoresMap[state.playerOne.id] = [state.newScore];
+      newPreviousScoresMap[player.id] = playersPreviousScores!;
+    } else {
+      //if first score add new entry
+      newPreviousScoresMap[player.id] = [state.newScore];
     }
 
+    //update players with new score
+    final updatedPlayersList = state.players.toList();
+    for (var i = 0; i < updatedPlayersList.length; i++) {
+      if (updatedPlayersList[i].id == playerId) {
+        updatedPlayersList.replaceAt(
+          i,
+          updatedPlayersList[i].copyWith(
+            isPlayersTurn: false,
+            remainingScore: newRemainingScore,
+          ),
+        );
+      } else {
+        updatedPlayersList.replaceAt(
+          i,
+          updatedPlayersList[i]
+              .copyWith(isPlayersTurn: true),
+        );
+      }
+    }
+
+    //update state
     state = state.copyWith(
-      playerOne: state.playerOne.copyWith(
-        remainingScore: newRemainingScore,
-        isPlayersTurn: false,
-      ),
-      playerTwo: state.playerTwo.copyWith(
-        isPlayersTurn: true,
-      ),
       newScore: 0,
       gameOver: isGameOver,
       previousScores: newPreviousScoresMap,
-    );
-  }
-
-  void updatePlayerTwoScore() {
-    final newRemainingScore = state.playerTwo.remainingScore - state.newScore;
-    if (newRemainingScore < 0 || newRemainingScore == 1) {
-      return;
-    }
-    final isGameOver = newRemainingScore == 0;
-
-    final newPreviousScoresMap = Map<int, List<int>>.from(state.previousScores);
-    if (newPreviousScoresMap.containsKey(state.playerTwo.id)) {
-      final playersPreviousScores = newPreviousScoresMap[state.playerTwo.id];
-      playersPreviousScores?.add(state.newScore);
-      newPreviousScoresMap[state.playerTwo.id] = playersPreviousScores!;
-    }
-    else{
-      newPreviousScoresMap[state.playerTwo.id] = [state.newScore];
-    }
-
-    state = state.copyWith(
-      playerTwo: state.playerTwo.copyWith(
-        remainingScore: newRemainingScore,
-        isPlayersTurn: false,
-      ),
-      playerOne: state.playerOne.copyWith(
-        isPlayersTurn: true,
-      ),
-      newScore: 0,
-      gameOver: isGameOver,
-      previousScores: newPreviousScoresMap,
+      players: updatedPlayersList,
     );
   }
 
@@ -98,72 +95,68 @@ class GameNotifier extends StateNotifier<Game> {
   }
 
   void undoPreviousScore() {
-    if (state.throwingPlayer == state.playerOne) {
-      if (!state.previousScores.containsKey(state.playerTwo.id)) {
+    if (state.previousScores.isNotEmpty) {
+      final player =
+          state.players.firstWhere((element) => !element.isPlayersTurn);
+
+      if(state.previousScores[player.id]!.isEmpty){
         return;
       }
-      //undo player 2 previous shot
-      state = state.undoPreviousScore(state.playerTwo.id);
-    } else {
-      if (!state.previousScores.containsKey(state.playerOne.id)) {
-        return;
+
+      final updatedPreviousScoresMap =
+          Map<int, List<int>>.from(state.previousScores);
+      int previousScore = 0;
+
+      if (updatedPreviousScoresMap.containsKey(player.id)) {
+        final playersPreviousScores = updatedPreviousScoresMap[player.id];
+        if (playersPreviousScores!.isNotEmpty) {
+          previousScore = playersPreviousScores.last;
+          playersPreviousScores.removeLast();
+        }
+        updatedPreviousScoresMap[player.id] = playersPreviousScores;
+
+        //update players with new score
+        final updatedPlayersList = state.players.toList();
+        for (var i = 0; i < updatedPlayersList.length; i++) {
+          if (updatedPlayersList[i].id == player.id) {
+            updatedPlayersList.replaceAt(
+              i,
+              updatedPlayersList[i].copyWith(
+                isPlayersTurn: true,
+                remainingScore: player.remainingScore + previousScore,
+              ),
+            );
+          } else {
+            updatedPlayersList.replaceAt(
+              i,
+              updatedPlayersList[i].copyWith(isPlayersTurn: false),
+            );
+          }
+        }
+
+        state = state.copyWith(
+          players: updatedPlayersList,
+          previousScores: updatedPreviousScoresMap,
+          gameOver: false,
+          newScore: 0,
+        );
       }
-      //undo player 1 previous shot
-      state = state.undoPreviousScore(state.playerOne.id);
     }
   }
 
-  void checkoutCurrentPlayer() {
-    if (state.throwingPlayer == state.playerOne) {
-      if (state.playerOne.remainingScore > 50) {
-        //TODO: use service to validate
-        return;
-      }
-
-      final newPreviousScores = state.previousScores[state.playerOne.id];
-      newPreviousScores!.add(state.playerOne.remainingScore);
-
-      state = state.copyWith(
-        playerOne: state.playerOne.copyWith(
-          remainingScore: 0,
-        ),
-        gameOver: true,
-        previousScores: {
-          ...state.previousScores,
-          ...{state.playerOne.id: newPreviousScores}
-        },
-      );
-    } else {
-      if (state.playerTwo.remainingScore > 50) {
-        return;
-      }
-
-      final newPreviousScores = state.previousScores[state.playerTwo.id];
-      newPreviousScores!.add(state.playerTwo.remainingScore);
-
-      state = state.copyWith(
-        playerTwo: state.playerTwo.copyWith(
-          remainingScore: 0,
-        ),
-        gameOver: true,
-        previousScores: {
-          ...state.previousScores,
-          ...{state.playerTwo.id: newPreviousScores}
-        },
-      );
-    }
+  void checkoutPlayer(int playerId) {
+    updatePlayerScore(playerId, checkout: true);
   }
 
   void restart() {
     state = state.copyWith(
-        playerOne: state.playerOne.copyWith(
-          remainingScore: state.gameSettings.startingScore,
-        ),
-        playerTwo: state.playerTwo.copyWith(
-          remainingScore: state.gameSettings.startingScore,
-        ),
-        gameOver: false,
-        newScore: 0,
-        previousScores: {});
+      players: [
+        state.gameSettings.playerOne,
+        state.gameSettings.playerTwo,
+      ],
+      gameOver: false,
+      newScore: 0,
+      previousScores: {},
+    );
   }
 }
