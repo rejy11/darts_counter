@@ -12,6 +12,7 @@ class Game extends Equatable {
   final bool gameOver;
   final Map<int, List<int>> _previousScores; //{playerId: score}
   final List<Player> _players;
+  final Player throwingPlayer;
 
   const Game(
     this.gameSettings,
@@ -19,6 +20,7 @@ class Game extends Equatable {
     this.newScore,
     this.gameOver,
     this._previousScores,
+    this.throwingPlayer,
   );
 
   UnmodifiableListView<Player> get players =>
@@ -27,16 +29,13 @@ class Game extends Equatable {
   UnmodifiableMapView<int, List<int>> get previousScores =>
       UnmodifiableMapView<int, List<int>>(_previousScores);
 
-  Player get throwingPlayer {
-    return players.firstWhere((element) => element.isPlayersTurn);
-  }
-
   Game copyWith({
     GameSettings? gameSettings,
     List<Player>? players,
     int? newScore,
     bool? gameOver,
     Map<int, List<int>>? previousScores,
+    Player? throwingPlayer,
   }) {
     return Game(
       gameSettings ?? this.gameSettings,
@@ -44,6 +43,7 @@ class Game extends Equatable {
       newScore ?? this.newScore,
       gameOver ?? this.gameOver,
       previousScores ?? _previousScores,
+      throwingPlayer ?? this.throwingPlayer,
     );
   }
 
@@ -54,5 +54,6 @@ class Game extends Equatable {
         newScore,
         gameOver,
         previousScores,
+        throwingPlayer,
       ];
 }

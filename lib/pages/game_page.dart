@@ -27,7 +27,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     super.dispose();
   }
 
-  Widget buildPlayerScoreView(Player player) {
+  Widget buildPlayerScoreView(Player player, bool isThrowingPlayer) {
     return Expanded(
       child: ConstrainedBox(
         constraints: const BoxConstraints.tightFor(
@@ -37,7 +37,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         child: Container(
           child: Stack(
             children: [
-              player.isPlayersTurn
+              isThrowingPlayer
                   ? const Positioned(
                       child: Center(
                         child: Padding(
@@ -175,8 +175,10 @@ class _GamePageState extends ConsumerState<GamePage> {
             flex: 4,
             child: Row(
               children: [
-                buildPlayerScoreView(playerOne),
-                buildPlayerScoreView(playerTwo),
+                buildPlayerScoreView(
+                    playerOne, game.throwingPlayer.id == playerOne.id),
+                buildPlayerScoreView(
+                    playerTwo, game.throwingPlayer.id == playerTwo.id),
               ],
             ),
           ),
