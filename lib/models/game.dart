@@ -13,6 +13,7 @@ class Game extends Equatable {
   final Map<int, List<int>> _previousScores; //{playerId: score}
   final List<Player> _players;
   final Player throwingPlayer;
+  final bool invalidScore;
 
   const Game(
     this.gameSettings,
@@ -21,6 +22,7 @@ class Game extends Equatable {
     this.gameOver,
     this._previousScores,
     this.throwingPlayer,
+    this.invalidScore,
   );
 
   UnmodifiableListView<Player> get players =>
@@ -36,6 +38,7 @@ class Game extends Equatable {
     bool? gameOver,
     Map<int, List<int>>? previousScores,
     Player? throwingPlayer,
+    bool? invalidScore,
   }) {
     return Game(
       gameSettings ?? this.gameSettings,
@@ -44,6 +47,7 @@ class Game extends Equatable {
       gameOver ?? this.gameOver,
       previousScores ?? _previousScores,
       throwingPlayer ?? this.throwingPlayer,
+      invalidScore ?? this.invalidScore,
     );
   }
 
@@ -55,5 +59,6 @@ class Game extends Equatable {
         gameOver,
         previousScores,
         throwingPlayer,
+        invalidScore,
       ];
 }

@@ -13,6 +13,7 @@ final gameController = StateNotifierProvider<GameNotifier, Game>((ref) {
     false,
     const {},
     gameSettings.startingPlayer,
+    false,
   );
   return GameNotifier(game);
 });
@@ -34,7 +35,8 @@ class GameNotifier extends StateNotifier<Game> {
     } else {
       newPlayerRemainingScore = player.remainingScore - scoreToDeduct;
       if (newPlayerRemainingScore < 0 || newPlayerRemainingScore == 1) {
-        return;
+        newPlayerRemainingScore += scoreToDeduct;
+        scoreToDeduct = 0;
       }
     }
     final isGameOver = newPlayerRemainingScore == 0;
@@ -65,7 +67,7 @@ class GameNotifier extends StateNotifier<Game> {
     }
 
     //get new throwing player
-    final newThrowingPlayer = state.players
+    final newThrowingPlayer = updatedPlayersList
         .firstWhere((element) => element.id != state.throwingPlayer.id);
 
     //update state
@@ -75,22 +77,31 @@ class GameNotifier extends StateNotifier<Game> {
       previousScores: newPreviousScoresMap,
       players: updatedPlayersList,
       throwingPlayer: newThrowingPlayer,
+      invalidScore: false,
     );
   }
 
   void updateNewScore(int score) {
     if (state.newScore + score > 180) return;
+    bool invalidScore = false;
 
     final newScoreString = state.newScore.toString() + score.toString();
     final newScore = int.tryParse(newScoreString);
 
     if (newScore! > 180) return;
 
-    state = state.copyWith(newScore: newScore);
+    if (state.throwingPlayer.remainingScore - newScore < 0) {
+      invalidScore = true;
+    }
+
+    state = state.copyWith(
+      newScore: newScore,
+      invalidScore: invalidScore,
+    );
   }
 
   void clearNewScore() {
-    state = state.copyWith(newScore: 0);
+    state = state.copyWith(newScore: 0, invalidScore: false);
   }
 
   void undoPreviousScore() {
@@ -130,7 +141,7 @@ class GameNotifier extends StateNotifier<Game> {
       }
 
       //get new throwing player
-      final newThrowingPlayer = state.players
+      final newThrowingPlayer = updatedPlayersList
           .firstWhere((element) => element.id != state.throwingPlayer.id);
 
       state = state.copyWith(
@@ -139,6 +150,7 @@ class GameNotifier extends StateNotifier<Game> {
         gameOver: false,
         newScore: 0,
         throwingPlayer: newThrowingPlayer,
+        invalidScore: false,
       );
     }
   }
@@ -156,6 +168,7 @@ class GameNotifier extends StateNotifier<Game> {
       gameOver: false,
       newScore: 0,
       previousScores: {},
+      invalidScore: false,
     );
   }
 }

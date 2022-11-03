@@ -1,3 +1,5 @@
+import 'package:community_material_icon/community_material_icon.dart';
+import 'package:darts_counter/dialogs/custom_alert_dialog.dart';
 import 'package:darts_counter/models/game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +29,8 @@ class _GamePageState extends ConsumerState<GamePage> {
     super.dispose();
   }
 
-  Widget buildPlayerScoreView(Player player, bool isThrowingPlayer) {
+  Widget buildPlayerScoreView(
+      Player player, bool isThrowingPlayer, bool invalidScore) {
     return Expanded(
       child: ConstrainedBox(
         constraints: const BoxConstraints.tightFor(
@@ -37,6 +40,12 @@ class _GamePageState extends ConsumerState<GamePage> {
         child: Container(
           child: Stack(
             children: [
+              Positioned(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(player.name),
+                ),
+              ),
               isThrowingPlayer
                   ? const Positioned(
                       child: Center(
@@ -49,10 +58,12 @@ class _GamePageState extends ConsumerState<GamePage> {
                   : const SizedBox(),
               Positioned(
                 child: Center(
-                  child: Text(
-                    player.remainingScore.toString(),
-                    style: const TextStyle(fontSize: 32),
-                  ),
+                  child: invalidScore && isThrowingPlayer
+                      ? const Text('BUST')
+                      : Text(
+                          player.remainingScore.toString(),
+                          style: const TextStyle(fontSize: 32),
+                        ),
                 ),
               ),
             ],
@@ -110,6 +121,37 @@ class _GamePageState extends ConsumerState<GamePage> {
     );
   }
 
+  Widget buildRestartButton() {
+    return IconButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return createAlertDialog(
+              titleText: 'Restart',
+              bodyText: 'Are you sure?',
+              iconData: Icons.restart_alt_rounded,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    ref.read(gameController.notifier).restart();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Yes"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      icon: const Icon(Icons.restart_alt_rounded),
+    );
+  }
+
   //Evaluates whether the game has finished (a player has reached 0) and shows a dialog if true
   void evaluateGameState(Game game) {
     if (game.gameOver) {
@@ -122,15 +164,10 @@ class _GamePageState extends ConsumerState<GamePage> {
       showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: const Text(
-              'Game Shot',
-              textAlign: TextAlign.center,
-            ),
-            content: Text(
-              '$winningPlayer wins!',
-              textAlign: TextAlign.center,
-            ),
+          return createAlertDialog(
+            titleText: 'Game Shot',
+            bodyText: '$winningPlayer wins!',
+            iconData: CommunityMaterialIcons.bullseye_arrow,
             actions: [
               TextButton(
                 onPressed: () {
@@ -167,7 +204,10 @@ class _GamePageState extends ConsumerState<GamePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('${playerOne.name} vs ${playerTwo.name}'),
+        // title: Text('Game on'),
+        actions: [
+          buildRestartButton(),
+        ],
       ),
       body: Column(
         children: [
@@ -176,9 +216,15 @@ class _GamePageState extends ConsumerState<GamePage> {
             child: Row(
               children: [
                 buildPlayerScoreView(
-                    playerOne, game.throwingPlayer.id == playerOne.id),
+                  playerOne,
+                  game.throwingPlayer.id == playerOne.id,
+                  game.invalidScore,
+                ),
                 buildPlayerScoreView(
-                    playerTwo, game.throwingPlayer.id == playerTwo.id),
+                  playerTwo,
+                  game.throwingPlayer.id == playerTwo.id,
+                  game.invalidScore,
+                ),
               ],
             ),
           ),
@@ -243,11 +289,12 @@ class _GamePageState extends ConsumerState<GamePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        buildActionButton('CHECKOUT', () {
-                          ref
+                        buildActionButton(
+                          'CHECKOUT',
+                          () => ref
                               .read(gameController.notifier)
-                              .checkoutPlayer(game.throwingPlayer.id);
-                        }),
+                              .checkoutPlayer(game.throwingPlayer.id),
+                        ),
                         buildNumberButton(0),
                         buildActionButton(
                           game.newScore > 0 ? 'OK' : 'NO SCORE',
