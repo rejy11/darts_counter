@@ -43,6 +43,7 @@ dependencies:
   meta: ^1.7.0
   collection: ^1.16.0
   community_material_icon: ^5.9.55
+  dropdown_button2: ^1.8.9
 
 dev_dependencies:
   flutter_test:

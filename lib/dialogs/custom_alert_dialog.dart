@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 AlertDialog createAlertDialog({
   required String titleText,
-  required String bodyText,
+  required Widget content,
   IconData? iconData,
   List<Widget>? actions,
+  bool showDividers = true,
 }) {
   return AlertDialog(
     title: Column(
@@ -25,11 +26,14 @@ AlertDialog createAlertDialog({
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Divider(),
-        Text(bodyText),
-        const Divider(),
+        showDividers ? const Divider() : const SizedBox(),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: content,
+        ),
+        showDividers ? const Divider() : const SizedBox(),
       ],
     ),
-    actions: actions,
+    actions: actions,    
   );
 }

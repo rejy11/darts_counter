@@ -1,6 +1,8 @@
+import 'package:darts_counter/dialogs/custom_alert_dialog.dart';
 import 'package:darts_counter/models/game_settings.dart';
 import 'package:darts_counter/pages/game_page.dart';
 import 'package:darts_counter/providers/providers.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,32 +28,53 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
   }
 
   void startButtonPressed() async {
-    ref
-        .read(gameSettingsController.notifier)
-        .updatePlayerOneName(_playerOneNameController.text);
-    ref
-        .read(gameSettingsController.notifier)
-        .updatePlayerTwoName(_playerTwoNameController.text);
+    ref.read(gameSettingsController.notifier).updateSettings(
+          playerOneName: _playerOneNameController.text,
+          playerTwoName: _playerTwoNameController.text,
+        );
     await showDialog(
       context: context,
       builder: ((context) {
-        return SimpleDialog(
-          title: const Text(
-            'Throwing first',
-            textAlign: TextAlign.center,
-          ),
-          children: [
-            SimpleDialogOption(
-              child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, 1),
-                  child: Text(_playerOneNameController.text)),
-            ),
-            SimpleDialogOption(
-              child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, 2),
-                  child: Text(_playerTwoNameController.text)),
+        return createAlertDialog(
+          titleText: 'Throwing First',
+          iconData: Icons.person,
+          showDividers: false,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
             ),
           ],
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context, 1),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50)),
+                  child: Text(
+                    _playerOneNameController.text,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context, 2),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50)),
+                  child: Text(
+                    _playerTwoNameController.text,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       }),
     ).then((value) {
@@ -67,6 +90,74 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
     });
   }
 
+  Widget buildPlayerNameWidget(TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      maxLength: 12,
+      decoration: const InputDecoration(
+        labelText: 'Player name',
+        alignLabelWithHint: true,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black12),
+          borderRadius: BorderRadius.all(
+            Radius.circular(15),
+          ),
+        ),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black12),
+          borderRadius: BorderRadius.all(
+            Radius.circular(15),
+          ),
+        ),
+        hintText: 'Player name',
+        suffix: Opacity(
+          opacity: 0.6,
+          child: Icon(Icons.person),
+        ),
+      ),
+    );
+  }
+
+  Widget buildStartingScoreWidget(List<int> startingScores, int startingScore){
+    return DropdownButton2<int>(
+                value: startingScore,
+                underline: const SizedBox(),
+                buttonDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black12),
+                ),
+                dropdownDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black12),
+                ),
+                buttonHeight: 60,
+                icon: const Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(Icons.arrow_drop_down),
+                ),
+                onChanged: (value) {
+                  ref.read(gameSettingsController.notifier).updateSettings(
+                        startingScore: value,
+                        playerOneName: _playerOneNameController.text,
+                        playerTwoName: _playerTwoNameController.text,
+                      );
+                },
+                items: startingScores.map<DropdownMenuItem<int>>(
+                  (int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(value.toString()),
+                      ),
+                    );
+                  },
+                ).toList(),
+                focusColor: Colors.transparent,
+                isExpanded: true,
+              );
+  }
+
   @override
   Widget build(BuildContext context) {
     GameSettings gameSettings = ref.watch(gameSettingsController);
@@ -77,41 +168,23 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
     _playerTwoNameController.text = gameSettings.playerTwo.name;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Game Settings")),
+      appBar: AppBar(
+        title: const Text("Game Settings"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(50),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              TextField(
-                controller: _playerOneNameController,
-              ),
-              TextField(
-                controller: _playerTwoNameController,
-              ),
-              DropdownButton<int>(
-                value: startingScore,
-                onChanged: (value) {
-                  ref
-                      .read(gameSettingsController.notifier)
-                      .updateStartingScore(value!);
-                },
-                items: startingScores.map<DropdownMenuItem<int>>(
-                  (int value) {
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text(value.toString()),
-                    );
-                  },
-                ).toList(),
-                focusColor: Colors.transparent,
-                isExpanded: true,
-              ),
+              buildPlayerNameWidget(_playerOneNameController),
+              buildPlayerNameWidget(_playerTwoNameController),
+              buildStartingScoreWidget(startingScores, startingScore),
               ElevatedButton(
                 onPressed: startButtonPressed,
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(40),
+                  minimumSize: const Size.fromHeight(60),
                 ),
                 child: const Text('Start'),
               ),

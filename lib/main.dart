@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:darts_counter/pages/game_settings_page.dart';
 import 'package:darts_counter/pages/home_page.dart';
+import 'package:darts_counter/theme/color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_size/window_size.dart';
@@ -22,16 +24,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const HomePage(),
+      home: const GameSettingsPage(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.red,
-          brightness: Brightness.light,
-          //primary: Colors.purple,
-        ),
+        colorScheme: lightColorScheme,
         appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         ),        
         useMaterial3: true,
       ),

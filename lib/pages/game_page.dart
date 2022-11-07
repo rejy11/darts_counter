@@ -50,7 +50,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                   ? const Positioned(
                       child: Center(
                         child: Padding(
-                          padding: EdgeInsets.only(right: 80),
+                          padding: EdgeInsets.only(right: 90),
                           child: Icon(Icons.arrow_right, size: 32),
                         ),
                       ),
@@ -59,7 +59,10 @@ class _GamePageState extends ConsumerState<GamePage> {
               Positioned(
                 child: Center(
                   child: invalidScore && isThrowingPlayer
-                      ? const Text('BUST')
+                      ? const Text(
+                          'BUST',
+                          style: TextStyle(fontSize: 32),
+                        )
                       : Text(
                           player.remainingScore.toString(),
                           style: const TextStyle(fontSize: 32),
@@ -129,7 +132,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           builder: (context) {
             return createAlertDialog(
               titleText: 'Restart',
-              bodyText: 'Are you sure?',
+              content: const Text('Are you sure?'),
               iconData: Icons.restart_alt_rounded,
               actions: [
                 TextButton(
@@ -166,7 +169,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         builder: (context) {
           return createAlertDialog(
             titleText: 'Game Shot',
-            bodyText: '$winningPlayer wins!',
+            content: Text('$winningPlayer wins!'),
             iconData: CommunityMaterialIcons.bullseye_arrow,
             actions: [
               TextButton(

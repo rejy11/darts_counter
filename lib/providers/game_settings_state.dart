@@ -21,12 +21,16 @@ final gameSettingsController =
 class GameSettingsNotifier extends StateNotifier<GameSettings> {
   GameSettingsNotifier(GameSettings settings) : super(settings);
 
-  void updatePlayerOneName(String name) {
-    state = state.copyWith(playerOne: state.playerOne.copyWith(name: name));
-  }
-
-  void updatePlayerTwoName(String name) {
-    state = state.copyWith(playerTwo: state.playerTwo.copyWith(name: name));
+  void updateSettings({
+    String? playerOneName,
+    String? playerTwoName,
+    int? startingScore,
+  }) {
+    state = state.copyWith(
+      playerOne: playerOneName == null ? state.playerOne : state.playerOne.copyWith(name: playerOneName),
+      playerTwo: playerTwoName == null ? state.playerTwo : state.playerTwo.copyWith(name: playerTwoName),
+      startingScore: startingScore ?? state.startingScore,
+    );
   }
 
   void updatePlayersTurn(int playerId) {
@@ -35,13 +39,5 @@ class GameSettingsNotifier extends StateNotifier<GameSettings> {
     } else {
       state = state.copyWith(startingPlayer: state.playerTwo);
     }
-  }
-
-  void updateStartingScore(int startingScore) {
-    state = state.copyWith(
-      playerOne: state.playerOne.copyWith(remainingScore: startingScore),
-      playerTwo: state.playerTwo.copyWith(remainingScore: startingScore),
-      startingScore: startingScore,
-    );
   }
 }
