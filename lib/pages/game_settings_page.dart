@@ -42,7 +42,7 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: const Text('CANCEL'),
             ),
           ],
           content: Row(
@@ -118,44 +118,44 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
     );
   }
 
-  Widget buildStartingScoreWidget(List<int> startingScores, int startingScore){
+  Widget buildStartingScoreWidget(List<int> startingScores, int startingScore) {
     return DropdownButton2<int>(
-                value: startingScore,
-                underline: const SizedBox(),
-                buttonDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.black12),
-                ),
-                dropdownDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.black12),
-                ),
-                buttonHeight: 60,
-                icon: const Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: Icon(Icons.arrow_drop_down),
-                ),
-                onChanged: (value) {
-                  ref.read(gameSettingsController.notifier).updateSettings(
-                        startingScore: value,
-                        playerOneName: _playerOneNameController.text,
-                        playerTwoName: _playerTwoNameController.text,
-                      );
-                },
-                items: startingScores.map<DropdownMenuItem<int>>(
-                  (int value) {
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(value.toString()),
-                      ),
-                    );
-                  },
-                ).toList(),
-                focusColor: Colors.transparent,
-                isExpanded: true,
-              );
+      value: startingScore,
+      underline: const SizedBox(),
+      buttonDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.black12),
+      ),
+      dropdownDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.black12),
+      ),
+      buttonHeight: 60,
+      icon: const Padding(
+        padding: EdgeInsets.only(right: 10),
+        child: Icon(Icons.arrow_drop_down),
+      ),
+      onChanged: (value) {
+        ref.read(gameSettingsController.notifier).updateSettings(
+              startingScore: value,
+              playerOneName: _playerOneNameController.text,
+              playerTwoName: _playerTwoNameController.text,
+            );
+      },
+      items: startingScores.map<DropdownMenuItem<int>>(
+        (int value) {
+          return DropdownMenuItem<int>(
+            value: value,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(value.toString()),
+            ),
+          );
+        },
+      ).toList(),
+      focusColor: Colors.transparent,
+      isExpanded: true,
+    );
   }
 
   @override
@@ -167,28 +167,34 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
     _playerOneNameController.text = gameSettings.playerOne.name;
     _playerTwoNameController.text = gameSettings.playerTwo.name;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Game Settings"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(50),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              buildPlayerNameWidget(_playerOneNameController),
-              buildPlayerNameWidget(_playerTwoNameController),
-              buildStartingScoreWidget(startingScores, startingScore),
-              ElevatedButton(
-                onPressed: startButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(60),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Game Settings"),
+          centerTitle: true,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                buildPlayerNameWidget(_playerOneNameController),
+                buildPlayerNameWidget(_playerTwoNameController),
+                buildStartingScoreWidget(startingScores, startingScore),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: startButtonPressed,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(60),
+                  ),
+                  child: const Text('START'),
                 ),
-                child: const Text('Start'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

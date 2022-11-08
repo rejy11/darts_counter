@@ -32,44 +32,63 @@ class _GamePageState extends ConsumerState<GamePage> {
   Widget buildPlayerScoreView(
       Player player, bool isThrowingPlayer, bool invalidScore) {
     return Expanded(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(
-          width: double.infinity,
-          height: double.infinity,
-        ),
-        child: Container(
-          child: Stack(
-            children: [
-              Positioned(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Text(player.name),
-                ),
-              ),
-              isThrowingPlayer
-                  ? const Positioned(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 90),
-                          child: Icon(Icons.arrow_right, size: 32),
-                        ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 3, right: 3, bottom: 5),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          child: Card(
+            child: Stack(
+              children: [
+                Positioned(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Text(
+                        player.name,
+                        style: const TextStyle(fontSize: 24),
                       ),
-                    )
-                  : const SizedBox(),
-              Positioned(
-                child: Center(
-                  child: invalidScore && isThrowingPlayer
-                      ? const Text(
-                          'BUST',
-                          style: TextStyle(fontSize: 32),
-                        )
-                      : Text(
-                          player.remainingScore.toString(),
-                          style: const TextStyle(fontSize: 32),
-                        ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                player.checkout != null
+                    ? Positioned(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 100),
+                            child: Text(player.checkout.toString()),
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+                isThrowingPlayer
+                    ? const Positioned(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 90),
+                            child: Icon(Icons.arrow_right, size: 32),
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+                Positioned(
+                  child: Center(
+                    child: invalidScore && isThrowingPlayer
+                        ? const Text(
+                            'BUST',
+                            style: TextStyle(fontSize: 32),
+                          )
+                        : Text(
+                            player.remainingScore.toString(),
+                            style: const TextStyle(fontSize: 32),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -82,11 +101,13 @@ class _GamePageState extends ConsumerState<GamePage> {
         width: double.infinity,
         height: double.infinity,
         child: TextButton(
+          style: TextButton.styleFrom(shape: const RoundedRectangleBorder()),
           onPressed: () {
             ref.read(gameController.notifier).updateNewScore(value);
           },
           child: Text(
             value.toString(),
+            style: const TextStyle(fontSize: 18),
           ),
         ),
       ),
@@ -99,9 +120,14 @@ class _GamePageState extends ConsumerState<GamePage> {
         width: double.infinity,
         height: double.infinity,
         child: TextButton(
+          style: TextButton.styleFrom(
+            shape: const RoundedRectangleBorder(),
+            
+          ),
           onPressed: action,
           child: Text(
             actionText,
+            style: const TextStyle(fontSize: 16),
           ),
         ),
       ),
@@ -118,6 +144,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           decoration: const InputDecoration(
             border: InputBorder.none,
           ),
+          style: const TextStyle(fontSize: 24),
           readOnly: true,
         ),
       ),
@@ -137,14 +164,14 @@ class _GamePageState extends ConsumerState<GamePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancel"),
+                  child: const Text("CANCEL"),
                 ),
                 TextButton(
                   onPressed: () {
                     ref.read(gameController.notifier).restart();
                     Navigator.of(context).pop();
                   },
-                  child: const Text("Yes"),
+                  child: const Text("YES"),
                 ),
               ],
             );
@@ -177,14 +204,18 @@ class _GamePageState extends ConsumerState<GamePage> {
                   ref.read(gameController.notifier).undoPreviousScore();
                   Navigator.pop(context);
                 },
-                child: const Text('Undo'),
+                child: const Text('UNDO'),
               ),
               TextButton(
                 onPressed: () {
                   ref.read(gameController.notifier).restart();
                   Navigator.pop(context);
                 },
-                child: const Text('Restart'),
+                child: const Text('RESTART'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -216,19 +247,22 @@ class _GamePageState extends ConsumerState<GamePage> {
         children: [
           Expanded(
             flex: 4,
-            child: Row(
-              children: [
-                buildPlayerScoreView(
-                  playerOne,
-                  game.throwingPlayer.id == playerOne.id,
-                  game.invalidScore,
-                ),
-                buildPlayerScoreView(
-                  playerTwo,
-                  game.throwingPlayer.id == playerTwo.id,
-                  game.invalidScore,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  buildPlayerScoreView(
+                    playerOne,
+                    game.throwingPlayer.id == playerOne.id,
+                    game.invalidScore,
+                  ),
+                  buildPlayerScoreView(
+                    playerTwo,
+                    game.throwingPlayer.id == playerTwo.id,
+                    game.invalidScore,
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -240,6 +274,7 @@ class _GamePageState extends ConsumerState<GamePage> {
               ),
               child: Column(
                 children: [
+                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -249,7 +284,9 @@ class _GamePageState extends ConsumerState<GamePage> {
                             () => ref
                                 .read(gameController.notifier)
                                 .undoPreviousScore()),
+                        const VerticalDivider(width: 1),
                         buildNewScoreView(),
+                        const VerticalDivider(width: 1),
                         buildActionButton(
                             'CLEAR',
                             () => ref
@@ -258,36 +295,46 @@ class _GamePageState extends ConsumerState<GamePage> {
                       ],
                     ),
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(7),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(8),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(9),
                       ],
                     ),
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(4),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(5),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(6),
                       ],
                     ),
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(1),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(2),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(3),
                       ],
                     ),
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -298,7 +345,9 @@ class _GamePageState extends ConsumerState<GamePage> {
                               .read(gameController.notifier)
                               .checkoutPlayer(game.throwingPlayer.id),
                         ),
+                        const VerticalDivider(width: 1),
                         buildNumberButton(0),
+                        const VerticalDivider(width: 1),
                         buildActionButton(
                           game.newScore > 0 ? 'OK' : 'NO SCORE',
                           () => ref

@@ -34,6 +34,7 @@ AlertDialog createAlertDialog({
         showDividers ? const Divider() : const SizedBox(),
       ],
     ),
-    actions: actions,    
+    actions: actions,
+    actionsAlignment: MainAxisAlignment.end,
   );
 }

@@ -1,11 +1,13 @@
 import 'package:darts_counter/extensions/list_extensions.dart';
 import 'package:darts_counter/models/game.dart';
+import 'package:darts_counter/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'game_settings_state.dart';
 
 final gameController = StateNotifierProvider<GameNotifier, Game>((ref) {
   final gameSettings = ref.watch(gameSettingsController);
+  final checkoutMap = ref.read(checkoutProvider);
   final game = Game(
     gameSettings,
     [gameSettings.playerOne, gameSettings.playerTwo],
@@ -15,11 +17,13 @@ final gameController = StateNotifierProvider<GameNotifier, Game>((ref) {
     gameSettings.startingPlayer,
     false,
   );
-  return GameNotifier(game);
+  return GameNotifier(game, checkoutMap);
 });
 
 class GameNotifier extends StateNotifier<Game> {
-  GameNotifier(Game game) : super(game);
+  GameNotifier(Game game, this.checkoutMap) : super(game);
+
+  final Map<int, String> checkoutMap;
 
   void updatePlayerScore(int playerId, {bool checkout = false}) {
     int scoreToDeduct = state.newScore;
@@ -39,8 +43,7 @@ class GameNotifier extends StateNotifier<Game> {
         scoreToDeduct = 0;
       }
     }
-    final isGameOver = newPlayerRemainingScore == 0;
-
+    
     //update previousScores map
     final newPreviousScoresMap = Map<int, List<int>>.from(state.previousScores);
     if (newPreviousScoresMap.containsKey(player.id)) {
@@ -61,6 +64,7 @@ class GameNotifier extends StateNotifier<Game> {
           i,
           updatedPlayersList[i].copyWith(
             remainingScore: newPlayerRemainingScore,
+            checkout: _getCheckout(newPlayerRemainingScore),
           ),
         );
       }
@@ -73,11 +77,11 @@ class GameNotifier extends StateNotifier<Game> {
     //update state
     state = state.copyWith(
       newScore: 0,
-      gameOver: isGameOver,
+      gameOver: newPlayerRemainingScore == 0,
       previousScores: newPreviousScoresMap,
       players: updatedPlayersList,
       throwingPlayer: newThrowingPlayer,
-      invalidScore: false,
+      invalidScore: false,      
     );
   }
 
@@ -170,5 +174,10 @@ class GameNotifier extends StateNotifier<Game> {
       previousScores: {},
       invalidScore: false,
     );
+  }
+
+  String? _getCheckout(int remainingScore){
+    final checkout = checkoutMap[remainingScore];
+    return checkout;
   }
 }

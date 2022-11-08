@@ -6,8 +6,8 @@ final gameSettingsController =
     StateNotifierProvider<GameSettingsNotifier, GameSettings>(
   (ref) {
     const startingScore = 301;
-    const playerOne = Player(1, "Player 1", startingScore);
-    const playerTwo = Player(2, "Player 2", startingScore);
+    const playerOne = Player(1, "Player 1", startingScore, null);
+    const playerTwo = Player(2, "Player 2", startingScore, null);
     const settings = GameSettings(
       playerOne,
       playerTwo,
