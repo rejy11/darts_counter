@@ -171,7 +171,10 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Game Settings"),
+          title: const Text(
+            "Game Settings",
+            style: TextStyle(fontSize: 32, letterSpacing: 2),
+          ),
           centerTitle: true,
         ),
         body: Padding(
@@ -187,12 +190,17 @@ class GameSettingsPageState extends ConsumerState<GameSettingsPage> {
                 buildStartingScoreWidget(startingScores, startingScore),
                 const SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: startButtonPressed,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(60),
-                  ),
-                  child: const Text('START'),
-                ),
+                    onPressed: startButtonPressed,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(60),
+                    ),
+                    child: const Text(
+                      'START',
+                      style: TextStyle(
+                        fontSize: 24,
+                        letterSpacing: 2,
+                      ),
+                    )),
               ],
             ),
           ),

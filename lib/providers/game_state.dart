@@ -115,9 +115,10 @@ class GameNotifier extends StateNotifier<Game> {
     final player = state.players
         .firstWhere((element) => element.id != state.throwingPlayer.id);
 
-    if (state.previousScores[player.id]!.isEmpty) {
+    if(!state.previousScores.containsKey(player.id) || state.previousScores[player.id]!.isEmpty){
       return;
     }
+    
 
     final updatedPreviousScoresMap =
         Map<int, List<int>>.from(state.previousScores);
@@ -139,6 +140,7 @@ class GameNotifier extends StateNotifier<Game> {
             i,
             updatedPlayersList[i].copyWith(
               remainingScore: player.remainingScore + previousScore,
+              checkout: _getCheckout(player.remainingScore + previousScore),
             ),
           );
         }
@@ -178,6 +180,6 @@ class GameNotifier extends StateNotifier<Game> {
 
   String? _getCheckout(int remainingScore){
     final checkout = checkoutMap[remainingScore];
-    return checkout;
+    return checkout ?? "";
   }
 }

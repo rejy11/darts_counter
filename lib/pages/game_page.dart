@@ -40,6 +40,8 @@ class _GamePageState extends ConsumerState<GamePage> {
             height: double.infinity,
           ),
           child: Card(
+            elevation: 1,
+            color: Colors.white,
             child: Stack(
               children: [
                 Positioned(
@@ -100,34 +102,51 @@ class _GamePageState extends ConsumerState<GamePage> {
       child: SizedBox(
         width: double.infinity,
         height: double.infinity,
-        child: TextButton(
-          style: TextButton.styleFrom(shape: const RoundedRectangleBorder()),
-          onPressed: () {
-            ref.read(gameController.notifier).updateNewScore(value);
-          },
-          child: Text(
-            value.toString(),
-            style: const TextStyle(fontSize: 18),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextButton(
+            onPressed: () {
+              ref.read(gameController.notifier).updateNewScore(value);
+            },
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              side: const BorderSide(width: 0, color: Colors.transparent),
+              backgroundColor: Colors.grey[200],
+              foregroundColor: Colors.black,
+            ),
+            child: Text(
+              value.toString(),
+              style: const TextStyle(fontSize: 18),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget buildActionButton(String actionText, Function()? action) {
+  Widget buildActionButton(String actionText, Function()? action, {Color? backgroundColor, Color? foregroundColor}) {
     return Flexible(
       child: SizedBox(
         width: double.infinity,
         height: double.infinity,
-        child: TextButton(
-          style: TextButton.styleFrom(
-            shape: const RoundedRectangleBorder(),
-            
-          ),
-          onPressed: action,
-          child: Text(
-            actionText,
-            style: const TextStyle(fontSize: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              side: const BorderSide(color: Colors.transparent, width: 0),
+              backgroundColor: backgroundColor ?? Colors.blueGrey[400],
+              foregroundColor: foregroundColor ?? Colors.white,
+            ),
+            onPressed: action,
+            child: Text(
+              actionText,
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
         ),
       ),
@@ -136,17 +155,23 @@ class _GamePageState extends ConsumerState<GamePage> {
 
   Widget buildNewScoreView() {
     return Flexible(
-      child: SizedBox(
-        width: double.infinity,
-        child: TextField(
-          controller: _newScoreController,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: TextField(
+              controller: _newScoreController,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+              ),
+              style: const TextStyle(fontSize: 24),
+              readOnly: true,
+            ),
           ),
-          style: const TextStyle(fontSize: 24),
-          readOnly: true,
-        ),
+          // const Divider(indent: 40, endIndent: 40, color: Colors.black38,),
+        ],
       ),
     );
   }
@@ -274,7 +299,6 @@ class _GamePageState extends ConsumerState<GamePage> {
               ),
               child: Column(
                 children: [
-                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -284,9 +308,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                             () => ref
                                 .read(gameController.notifier)
                                 .undoPreviousScore()),
-                        const VerticalDivider(width: 1),
                         buildNewScoreView(),
-                        const VerticalDivider(width: 1),
                         buildActionButton(
                             'CLEAR',
                             () => ref
@@ -295,59 +317,50 @@ class _GamePageState extends ConsumerState<GamePage> {
                       ],
                     ),
                   ),
-                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(7),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(8),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(9),
                       ],
                     ),
                   ),
-                  const Divider(height: 1),
+                  // const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(4),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(5),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(6),
                       ],
                     ),
                   ),
-                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildNumberButton(1),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(2),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(3),
                       ],
                     ),
                   ),
-                  const Divider(height: 1),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         buildActionButton(
                           'CHECKOUT',
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.black,
                           () => ref
                               .read(gameController.notifier)
                               .checkoutPlayer(game.throwingPlayer.id),
                         ),
-                        const VerticalDivider(width: 1),
                         buildNumberButton(0),
-                        const VerticalDivider(width: 1),
                         buildActionButton(
                           game.newScore > 0 ? 'OK' : 'NO SCORE',
                           () => ref
