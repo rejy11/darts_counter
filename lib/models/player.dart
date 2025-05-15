@@ -1,38 +1,13 @@
-import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@immutable
-class Player extends Equatable {
-  final int id;
-  final String name;
-  final int remainingScore;
-  final String? checkout;
+part 'player.freezed.dart';
 
-  const Player(
-    this.id,
-    this.name,
-    this.remainingScore, this.checkout,
-  );
-
-  Player copyWith({
-    int? id,
-    String? name,
-    int? remainingScore,
+@freezed
+class Player with _$Player {
+  const factory Player({
+    required int id,
+    required String name,
+    required int remainingScore,
     String? checkout,
-  }) {
-    return Player(
-      id ?? this.id,
-      name ?? this.name,
-      remainingScore ?? this.remainingScore,
-      checkout ?? this.checkout,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        id,
-        name,
-        remainingScore,
-        checkout,
-      ];
+  }) = _Player;
 }

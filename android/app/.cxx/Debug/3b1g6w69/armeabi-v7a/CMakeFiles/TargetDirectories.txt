@@ -1,0 +1,2 @@
+C:/dev/darts-counter/darts_counter/android/app/.cxx/Debug/3b1g6w69/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/dev/darts-counter/darts_counter/android/app/.cxx/Debug/3b1g6w69/armeabi-v7a/CMakeFiles/rebuild_cache.dir

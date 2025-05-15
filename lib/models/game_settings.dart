@@ -1,41 +1,14 @@
-import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'player.dart';
 
-@immutable
-class GameSettings extends Equatable {
-  final Player playerOne;
-  final Player playerTwo;
-  final int startingScore;
-  final Player startingPlayer;
+part 'game_settings.freezed.dart';
 
-  const GameSettings(
-    this.playerOne,
-    this.playerTwo,
-    this.startingScore,
-    this.startingPlayer,
-  );
-
-  GameSettings copyWith({
-    Player? playerOne,
-    Player? playerTwo,
-    int? startingScore,
-    Player? startingPlayer,
-  }) {
-    return GameSettings(
-      playerOne ?? this.playerOne,
-      playerTwo ?? this.playerTwo,
-      startingScore ?? this.startingScore,
-      startingPlayer ?? this.startingPlayer,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        playerOne,
-        playerTwo,
-        startingScore,
-        startingPlayer,
-      ];
+@freezed
+class GameSettings with _$GameSettings {
+  const factory GameSettings({
+    required List<Player> players,
+    required int startingScore,
+    required Player startingPlayer,
+  }) = _GameSettings;
 }

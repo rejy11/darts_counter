@@ -1,1 +1,7 @@
 1. Currently, pressing a number button rebuilds the entire game page. Ideally it should only rebuild the score view.
+
+X01 functionality:
+- Record new score for player and deduct from their remaining score
+- Undo previous score for player
+- Record 'no score' for a player
+- 'Checkout' a player if the entered score takes them to zero
