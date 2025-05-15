@@ -3,5 +3,5 @@
     "Cupertino",
     "riverpod"
   ],
-  "dart.flutterSdkPath": ".fvm/versions/3.29.1"
+  "dart.flutterSdkPath": ".fvm/versions/3.29.3"
 }
