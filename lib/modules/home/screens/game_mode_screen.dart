@@ -1,28 +1,24 @@
 import 'package:darts_counter/modules/x01/screens/x01_settings_screen.dart';
 import 'package:darts_counter/utils/spacing.dart';
-import 'package:darts_counter/widgets/primary_button.dart';
+import 'package:darts_counter/widgets/custom_filled_button.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class GameModeScreen extends StatelessWidget {
+  const GameModeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('GAME MODE'),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Spacing.screenPadding),
           child: Column(
             children: [
-              const SizedBox(height: Spacing.xxl),
-              Text(
-                'Darts Counter',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-              ),
-              const SizedBox(height: Spacing.xxl),
-              PrimaryButton(
+              CustomFilledButton(
                 label: 'X01',
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(

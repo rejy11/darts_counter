@@ -30,30 +30,25 @@ class _PlayerNameWidgetState extends ConsumerState<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    const border = OutlineInputBorder(
-      //borderSide: BorderSide(color: Colors.black12),
-      borderRadius: BorderRadius.all(
-        Radius.circular(15),
-      ),
-    );
     return TextField(
       controller: controller,
       maxLength: 12,
       decoration: InputDecoration(
         labelText: widget.labelText,
-        alignLabelWithHint: true,
-        //enabledBorder: border,
-        //border: border,
+        //fillColor: Colors.transparent,
+        border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
         hintText: widget.hintText,
         suffix: const Opacity(
-          opacity: 0.2,
+          opacity: 0.4,
           child: Icon(Icons.person),
         ),
       ),
       onChanged: widget.onChanged,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+
+      //style: TextStyle(color: Colors.white),
+      // style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+      //       color: Theme.of(context).colorScheme.onSurface,
+      //     ),
     );
   }
 }

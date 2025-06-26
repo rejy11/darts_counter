@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({
+class CustomTextButton extends StatelessWidget {
+  const CustomTextButton({
     super.key,
     required this.onPressed,
     required this.label,
@@ -12,15 +12,13 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return TextButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(60),
-      ),
       child: Text(
         label,
         style: const TextStyle(
-          fontSize: 24,
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.bold,
           letterSpacing: 2,
         ),
       ),
