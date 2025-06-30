@@ -1,1 +1,0 @@
-C:\dev\darts-counter\darts_counter\build\app\intermediates\cxx\Debug\1n2rv534\obj\armeabi-v7a
